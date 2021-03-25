@@ -6,12 +6,16 @@
 package parksmartdatabaseconnector;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import static java.lang.System.exit;
 import java.net.ServerSocket;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -31,33 +35,34 @@ public class ParkSmartDatabaseConnector {
      */
     public static void main(String[] args) {
         SQLconnection sql;
-        PiScanner Pi;
         boolean PiIntialed = false;
-        String RecentClientIP = "";
         ServerSocket ss;
 
         try {
 
-            //instance creation
-            sql = new SQLconnection();
+            //load the properties file
+            InputStream isprop = new FileInputStream("config.properties");
+            Properties prop = new Properties();
+            prop.load(isprop);
+            String Address = prop.getProperty("address");
+            int sqlport = Integer.valueOf(prop.getProperty("sqlport"));
+            String user = prop.getProperty("user");
+            String password = prop.getProperty("pass");
+            boolean ModePlate = prop.getProperty("Mode","Plate").equals("Plate");
+            //check the properties file
+            if (Address.equals("sql.domain.com")) {
+                System.out.println("Config file not setup!");
+                exit(1);
+            }
+
+            //sql instance creation
+            sql = new SQLconnection(Address, sqlport, user, password);
 
             //open the port 1619
-            ss = new ServerSocket(1619);
-            //proccessVehicleSTIN(sql);
-            while (true) {
-                //create a socket for the clients to connect too
-                Pi = new PiScanner(ss);
-                PiIntialed = true;
-                RecentClientIP = Pi.getClientIP();
+            ss = new ServerSocket(Integer.valueOf(prop.getProperty("port")));
 
-                //get the string from the connected client. The client is disconnected each time it's done sending a string
-                String message = Pi.getString();
-
-                //output the message from the plate scanner to the console
-                System.out.println("Message recived from python: \n" + message);
-
-                //send the string to the database
-                proccessVehicleSTR(sql, message);
+            while (ModePlate) {
+                checkForMessages(ss, sql);
 
             }
 
@@ -67,16 +72,26 @@ public class ParkSmartDatabaseConnector {
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ParkSmartDatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("SQL driver not found, This error should only be present in the IDE");
+
+            System.out.println("SQL driver not found, make sure sqlijdbc4.jar is in the lib folder");
         } catch (IOException ex) {
             Logger.getLogger(ParkSmartDatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
-            if (PiIntialed) {                
-                System.out.println("Server Socket error: " + RecentClientIP);
-            } else {
-                System.out.println("Server Socket Error: No Address Found");
-            }
         }
 
+    }
+
+    public static void checkForMessages(ServerSocket ss, SQLconnection sql) throws IOException {
+        //create a socket for the clients to connect too
+        PiScanner Pi = new PiScanner(ss);
+
+        //get the string from the connected client. The client is disconnected each time it's done sending a string
+        String message = Pi.getString();
+
+        //output the message from the plate scanner to the console
+        System.out.println("Message recived from " + Pi.getClientIP() + ": \n" + message);
+
+        //send the string to the database
+        proccessVehicleSTR(sql, message);
     }
 
     public static void proccessVehicleSTR(SQLconnection sql, String message) {
@@ -136,7 +151,7 @@ public class ParkSmartDatabaseConnector {
         StringTokenizer stk = new StringTokenizer(line, ":");
         stk.nextToken();
         String data = stk.nextToken();
-        
+
         //Get the String within the double quotes
         stk = new StringTokenizer(data, ",");
         data = stk.nextToken();
@@ -146,7 +161,7 @@ public class ParkSmartDatabaseConnector {
     //the following methods were only used in testing:
     public static void manualAddVehical(SQLconnection sql) throws SQLException {
         Scanner input = new Scanner(System.in);
-//input from user
+        //input from user
         System.out.println("enter pass number");
         String Pass = input.next();
         System.out.println("enter plate number");
