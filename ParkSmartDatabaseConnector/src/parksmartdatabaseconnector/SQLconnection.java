@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import com.microsoft.sqlserver.jdbc.SQLServerDriver;
+
 
 /**
  *
