@@ -40,7 +40,8 @@ public class ParkSmartDatabaseConnector {
         int sqlport;
         String user;
         String password;
-        boolean ModePlate;
+        boolean ModePlate; //true = process plate data
+        boolean ModePass; //true = process pass data
         int ssport;
 
         try {
@@ -55,6 +56,7 @@ public class ParkSmartDatabaseConnector {
             password = prop.getProperty("pass");
             ssport = Integer.valueOf(prop.getProperty("port"));
             ModePlate = prop.getProperty("Mode","Plate").equals("Plate");
+            ModePass = prop.getProperty("Mode","Plate").equals("Plate");
             //check the properties file
             if (Address.equals("sql.domain.com")) {
                 System.out.println("Config file not setup!");
@@ -69,7 +71,10 @@ public class ParkSmartDatabaseConnector {
             ss = new ServerSocket(ssport);
 
             while (ModePlate) {
-                checkForMessages(ss, sql);
+                checkForPlate(ss, sql);
+            }
+            while(ModePass) {
+                
             }
 
         } catch (SQLException ex) {
@@ -86,7 +91,7 @@ public class ParkSmartDatabaseConnector {
 
     }
 
-    public static void checkForMessages(ServerSocket ss, SQLconnection sql) throws IOException {
+    public static void checkForPlate(ServerSocket ss, SQLconnection sql) throws IOException {
         //create a socket for the clients to connect too
         PiScanner Pi = new PiScanner(ss);
 
