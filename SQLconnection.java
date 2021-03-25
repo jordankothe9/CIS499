@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import com.microsoft.sqlserver.jdbc.SQLServerDriver;
 
 /**
  *
@@ -23,20 +24,23 @@ public class SQLconnection {
     Connection connection;
     PreparedStatement statement;
 
-    public SQLconnection() throws ClassNotFoundException, SQLException {
+    public SQLconnection(String address, int port, String user, String password) throws ClassNotFoundException, SQLException {
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
         String connectionUrl
-                = "jdbc:sqlserver://sql.yourdomain.com:1433;"
+                = "jdbc:sqlserver://" + address + ";"
                 + "database=master;"
-                + "user=username;"
-                + "password=password;"
+                + "user=" + user + ";"
+                + "password=" + password + ";"
                 + "encrypt=true;"
                 + "trustServerCertificate=true;"
                 + "loginTimeout=30;";
         //ResultSet resultSet = null;
 
         connection = DriverManager.getConnection(connectionUrl);
+        if(connection.isValid(30))
+            System.out.println("SQL Connection has been made");
+        
 
         //resultSet = statement.executeQuery(selectSql);
     }
