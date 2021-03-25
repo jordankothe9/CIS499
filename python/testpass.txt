@@ -1,5 +1,6 @@
 {
-    "PassNumber": "Sedan",
+    "PassNumber": "L09876",
     "LicensePlate": "QIJ991",
     "EXPyear": "2021"
+	"type": "0"
 }

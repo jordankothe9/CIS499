@@ -130,7 +130,8 @@ public class SQLconnection {
         statement = connection.prepareStatement("SELECT Pass_Number FROM dbo.Valid_Passes WHERE Pass_Number = ?");
         statement.setString(1, Pass);
         ResultSet PassNumberResults = statement.executeQuery();
-        return PassNumberResults.equals(Pass);
+        
+        return PassNumberResults.next();
 
     }
 
@@ -150,14 +151,14 @@ public class SQLconnection {
         if (!this.passexists(Pass)) {
             this.addPass(Pass);
         }
-        statement = connection.prepareStatement("UPDATE dbo.Vehicle SET Valid_Pass = ? WHERE License_Plate_Number = ?");
+        statement = connection.prepareStatement("UPDATE dbo.Vehicle SET Valid_Pass = ?, WHERE License_Plate_Number = ?");
         statement.setString(1, Pass);
         statement.setString(2, Plate);
     }
 
     public void addPass(String Pass) throws SQLException {
         //add the pass to the database here
-        statement = connection.prepareStatement("INSERT INTO dbo.Valid_Passes VALUES (?)");
+        statement = connection.prepareStatement("INSERT INTO dbo.Valid_Passes VALUES (?, ?, ?)");
         statement.setString(1, Pass);
         statement.setNull(2, Types.NULL);
         statement.setNull(3, Types.NULL);

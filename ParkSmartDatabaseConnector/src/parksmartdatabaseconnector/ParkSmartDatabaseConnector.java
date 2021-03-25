@@ -12,11 +12,11 @@ import java.io.InputStream;
 import java.io.StringReader;
 import static java.lang.System.exit;
 import java.net.ServerSocket;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,12 +56,16 @@ public class ParkSmartDatabaseConnector {
             password = prop.getProperty("pass");
             ssport = Integer.valueOf(prop.getProperty("port"));
             ModePlate = prop.getProperty("Mode","Plate").equals("Plate");
-            ModePass = prop.getProperty("Mode","Plate").equals("Plate");
+            ModePass = prop.getProperty("Mode","Plate").equals("Pass");
             //check the properties file
             if (Address.equals("sql.domain.com")) {
                 System.out.println("Config file not setup!");
                 exit(1);
             }
+            if(ModePlate)
+                System.out.println("Using Plate Mode");
+            if(ModePass)
+                System.out.println("Using Pass Mode, you can change this in the config.properties");
         
 
             //sql instance creation
@@ -74,7 +78,7 @@ public class ParkSmartDatabaseConnector {
                 checkForPlate(ss, sql);
             }
             while(ModePass) {
-                
+                checkForPass(ss, sql);
             }
 
         } catch (SQLException ex) {
@@ -103,6 +107,37 @@ public class ParkSmartDatabaseConnector {
 
         //send the string to the database
         proccessVehicleSTR(sql, message);
+    }
+    
+    public static void checkForPass(ServerSocket ss, SQLconnection sql) throws IOException{
+        //create a socket for the clients to connect too
+        PiScanner Pi = new PiScanner(ss);
+
+        //get the string from the connected client. The client is disconnected each time it's done sending a string
+        String message = Pi.getString();
+
+        //output the message from the plate scanner to the console
+        System.out.println("Message recived from " + Pi.getClientIP() + ": \n" + message);
+
+        //send the string to the database
+        proccessPassSTR(sql, message);
+    }
+    
+    public static void proccessPassSTR(SQLconnection sql, String message){
+        try {
+            BufferedReader reader = new BufferedReader(new StringReader(message));
+            reader.readLine(); //throw away opening {
+            String pass = getString(reader.readLine());
+            String plate = getString(reader.readLine());
+            int expyear = Integer.parseInt(getString(reader.readLine()));
+            int type = Integer.parseInt(getString(reader.readLine()));
+            
+            Date date = new Date(01, 01, expyear);
+            sql.addPass(pass, date, type);
+            sql.addPassToVehicle(plate, pass);
+        } catch (IOException | SQLException ex) {
+            Logger.getLogger(ParkSmartDatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public static void proccessVehicleSTR(SQLconnection sql, String message) {
