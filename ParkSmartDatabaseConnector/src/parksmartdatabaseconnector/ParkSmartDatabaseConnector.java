@@ -95,7 +95,7 @@ public class ParkSmartDatabaseConnector {
 
     }
 
-    public static void checkForPlate(ServerSocket ss, SQLconnection sql) throws IOException {
+    public static void checkForPlate(ServerSocket ss, SQLconnection sql) throws IOException, SQLException, ClassNotFoundException {
         //create a socket for the clients to connect too
         PiScanner Pi = new PiScanner(ss);
 
@@ -106,10 +106,23 @@ public class ParkSmartDatabaseConnector {
         System.out.println("Message recived from " + Pi.getClientIP() + ": \n" + message);
 
         //send the string to the database
+        
+        if(sql.age() > 300000){
+            System.out.println("SQL connection is more than 5 minutes old. Reconnecting");
+            sql.close();
+            InputStream isprop = new FileInputStream("config.properties");
+            Properties prop = new Properties();
+            prop.load(isprop);
+            String Address = prop.getProperty("address");            
+            int sqlport = Integer.valueOf(prop.getProperty("sqlport"));
+            String user = prop.getProperty("user");
+            String password = prop.getProperty("pass");
+            sql = new SQLconnection(Address, sqlport, user, password);
+        }
         proccessVehicleSTR(sql, message);
     }
     
-    public static void checkForPass(ServerSocket ss, SQLconnection sql) throws IOException{
+    public static void checkForPass(ServerSocket ss, SQLconnection sql) throws IOException, ClassNotFoundException, SQLException{
         //create a socket for the clients to connect too
         PiScanner Pi = new PiScanner(ss);
 
@@ -120,6 +133,18 @@ public class ParkSmartDatabaseConnector {
         System.out.println("Message recived from " + Pi.getClientIP() + ": \n" + message);
 
         //send the string to the database
+        if(sql.age() > 300000){
+            System.out.println("SQL connection is more than 5 minutes old. Reconnecting");
+            sql.close();
+            InputStream isprop = new FileInputStream("config.properties");
+            Properties prop = new Properties();
+            prop.load(isprop);
+            String Address = prop.getProperty("address");            
+            int sqlport = Integer.valueOf(prop.getProperty("sqlport"));
+            String user = prop.getProperty("user");
+            String password = prop.getProperty("pass");
+            sql = new SQLconnection(Address, sqlport, user, password);
+        }
         proccessPassSTR(sql, message);
     }
     

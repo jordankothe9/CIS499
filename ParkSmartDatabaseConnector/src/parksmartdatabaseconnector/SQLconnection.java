@@ -23,6 +23,7 @@ public class SQLconnection {
 
     Connection connection;
     PreparedStatement statement;
+    Timestamp created;
 
     public SQLconnection(String address, int port, String user, String password) throws ClassNotFoundException, SQLException {
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -38,8 +39,11 @@ public class SQLconnection {
         //ResultSet resultSet = null;
 
         connection = DriverManager.getConnection(connectionUrl);
-        if(connection.isValid(30))
+        if(connection.isValid(30)){
             System.out.println("SQL Connection has been made");
+            created = new Timestamp(System.currentTimeMillis());
+        }
+            
         
 
         //resultSet = statement.executeQuery(selectSql);
@@ -245,5 +249,17 @@ public class SQLconnection {
         if (new_Num_Used != Num_Used) {
             System.out.println("Warning: Spots used in lot " + lotkey + " could not be updated correctly");
         }
+        
+        
+    }
+    
+    public long age(){
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        
+        return now.getTime() - created.getTime();
+    }
+    
+    public void close() throws SQLException{
+        connection.close();
     }
 }
