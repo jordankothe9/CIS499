@@ -1,6 +1,6 @@
 import socket
 
-myfile = open("testpass.txt", "rt") # open test.txt for reading text this file is located where the py program is located
+myfile = open("test.txt", "rt") # open test.txt for reading text this file is located where the py program is located
 contents = myfile.read()         # read the entire file to string
 myfile.close()
 
