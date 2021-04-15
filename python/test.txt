@@ -6,6 +6,6 @@
     "Model": "CJ",
     "Color": "White",
     "State": "SC",
-    "Status": "in",
+    "Status": "out",
     "TimeStamp": "now"
 }

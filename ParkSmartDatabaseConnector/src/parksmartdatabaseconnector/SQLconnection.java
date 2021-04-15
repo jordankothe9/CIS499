@@ -247,23 +247,12 @@ public class SQLconnection {
         String num;
         ResultSet set;
         //get the number of spots used before
-        statement = connection.prepareStatement("SELECT Num_Used FROM dbo.Parking_lots WHERE Parking_Lot_Key = ?");
-        statement.setInt(1, lotkey);
+        statement = connection.prepareStatement("SELECT COUNT(*) FROM Vehicle FULL JOIN Vehicle_History ON Vehicle.License_Plate_Number = Vehicle_History.Plate_Number WHERE Vehicle_History.Stamp IN (SELECT MAX(Vehicle_History.Stamp) AS Stamp FROM Vehicle_History GROUP BY Vehicle_History.Plate_Number) AND Entry = '1'");
         statement.execute();
-        set = statement.getResultSet();
-        //System.out.println(set.getRow());
-        set.next();
+        ResultSet UsedSet = statement.getResultSet();
+        UsedSet.next();
+        Num_Used = UsedSet.getInt(1);
         
-        num = set.getString("Num_Used");
-        
-        Num_Used = Integer.parseInt(num);
-
-        //add or subtract?
-        if (in) {
-            Num_Used++;
-        } else {
-            Num_Used--;
-        }
 
         //after getting the current number of spots, add to it and update it
         statement = connection.prepareStatement("UPDATE dbo.Parking_lots SET Num_Used = ? WHERE Parking_Lot_Key = ?");
