@@ -53,8 +53,40 @@ public class SQLconnection {
     //1 check if the plate exists. If it does, update history and lot usage
     //2 if the plate doesn't exists add the plate, update history and lot usage
     //3 make an overloaded method if the plate number wasn't caught, only updatelot usage
-    public void scannedVehicle(String PlateNumber) {
-
+    public void scannedVehicle(String Plate, String color, String Make, String Region, String Model, float confidence, boolean entry, Timestamp stamp) throws SQLException {
+        if(this.plateexists(Plate)){
+            //update confidence
+            if(this.getConfidence(Plate) < confidence){
+                this.updateConfidence(Plate, confidence);
+            }
+        }else{
+            //add plate
+            this.addVehicle(Plate, color, Make, Region, Model, confidence);
+            //add history
+        }
+        
+        this.addHistory(Plate, entry, 1, stamp);
+    }
+    
+    public void updateConfidence(String Plate, float confidence) throws SQLException{
+        statement = connection.prepareStatement("UPDATE dbo.Vehicle SET Confidence = ? WHERE License_Plate_Number = ?");
+        statement.setFloat(1, confidence);
+        statement.setString(2, Plate);
+        statement.execute();
+    }
+    
+    //get the confidence of the specificed plate
+    public float getConfidence(String Plate) throws SQLException{
+        float conf = (float)0.9999;
+        statement = connection.prepareStatement("SELECT Confidence FROM dbo.Vehicle WHERE License_Plate_Number = ?");
+        statement.setString(1, Plate);
+        
+        statement.execute();
+        ResultSet rs = statement.getResultSet();
+        
+        rs.next();
+        return rs.getFloat(1);
+       
     }
 
     //with pass
@@ -261,5 +293,9 @@ public class SQLconnection {
     
     public void close() throws SQLException{
         connection.close();
+    }
+    
+    public boolean isValid() throws SQLException{
+        return connection.isValid(30);
     }
 }
