@@ -36,7 +36,6 @@ public class PiScanner {
         //ss = new ServerSocket(1619);
         System.out.println("Awaiting connection from Pi");
         socket = ss.accept();
-        System.out.println("Connection from " + socket);
         in = new DataInputStream(socket.getInputStream());
         OutputStream outputStream = socket.getOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
@@ -47,7 +46,7 @@ public class PiScanner {
     }
     
     public String getString() throws IOException{
-        System.out.println("waiting for string from " + socket);
+        
         boolean end = false;
         while (!end){
             int bytesRead = in.read(messageByte);

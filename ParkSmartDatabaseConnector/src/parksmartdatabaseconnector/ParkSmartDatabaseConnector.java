@@ -16,6 +16,8 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -76,6 +78,9 @@ public class ParkSmartDatabaseConnector {
 
             while (ModePlate) {
                 checkForPlate(ss, sql);
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                LocalDateTime now = LocalDateTime.now();
+                System.out.println(dtf.format(now));
             }
             while(ModePass) {
                 checkForPass(ss, sql);
@@ -107,9 +112,9 @@ public class ParkSmartDatabaseConnector {
 
         //send the string to the database
         
-        if(sql.age() > 300000){
+        if(sql.age() > 300000 | !sql.isValid()){
             System.out.println("SQL connection is more than 5 minutes old. Reconnecting");
-            sql.close();
+            
             InputStream isprop = new FileInputStream("config.properties");
             Properties prop = new Properties();
             prop.load(isprop);
@@ -194,8 +199,8 @@ public class ParkSmartDatabaseConnector {
                 stamp = new Timestamp((long) Double.parseDouble(TimeStampSTR)); //convert timestamp to an int and then an actual time stamp
             }
 
-            sql.addVehicle(Plate, Color, Make, Region, Model, confidence);
-            sql.addHistory(Plate, entry, 1, stamp);
+            sql.scannedVehicle(Plate, Color, Make, Region, Model, confidence, entry, stamp);
+            //sql.addHistory(Plate, entry, 1, stamp);
 
         } catch (SQLException ex) {
             Logger.getLogger(ParkSmartDatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
