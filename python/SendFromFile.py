@@ -11,7 +11,7 @@ s = socket.socket()
 port = 1619
 
 # connect to the server on local computer 
-s.connect(('localhost', port)) 
+s.connect(('sql.jordankothe.com', port)) 
 
 # receive data from the server 
 print (s.recv(4069).decode() )

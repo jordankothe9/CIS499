@@ -1,11 +1,11 @@
 {
     "VehicleType": "Sedan",
-    "LicensePlate": "QIJ991",
+    "LicensePlate": "TST123",
     "LicensePlateConf": 0.954,
     "Make": "Jeep",
     "Model": "CJ",
     "Color": "White",
     "State": "SC",
-    "Status": "out",
+    "Status": "in",
     "TimeStamp": "now"
 }
