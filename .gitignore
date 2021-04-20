@@ -1,0 +1,4 @@
+
+website/Client/node_modules/*
+website/Client/env
+website/Client/public/env
