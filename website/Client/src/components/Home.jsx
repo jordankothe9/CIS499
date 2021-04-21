@@ -13,9 +13,10 @@ import Accordion from "react-bootstrap/Accordion";
 
 
 
-
+alert("This website is in development and is part of a College Project");
 
 export default class Home extends Component {
+  
   render() {
     return (
      

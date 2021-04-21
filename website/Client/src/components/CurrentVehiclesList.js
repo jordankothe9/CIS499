@@ -29,8 +29,9 @@ export default function VehicleList(){
              
            return()=>clearInterval(interval)
       },[])
+	  
       
-  
+	  
       return(
 	  //var statusVehicle
         <div className = "container-fluid" id = "currentVehiclesContainer">
@@ -51,6 +52,11 @@ export default function VehicleList(){
               }else if(val.confidence > 75 && val.confidence <= 100){
                 confidenceColor = 'success';
               }
+			  
+			  var formattedDate = "no date";
+				if(val.stamp != null){
+					formattedDate = val.stamp.replace(/T/, ' ').replace(/\..+/, '')
+				}
               return <div key = {val.id}>
               {" "}
               <div id = "currentVehicles">
@@ -65,13 +71,12 @@ export default function VehicleList(){
                         </Card.Header>
                         <Accordion.Collapse eventKey="0">
                           <Card.Body>
-                            Confidence: {val.confidence}% <br></br>
-                            Time: {val.stamp}
+                            Confidence: {val.confidence} <br></br>
+                            Time In: {formattedDate}
                             <br></br>
                             Make: {val.make} <br></br>
                             Model: {val.model} <br></br>
                             Color: {val.color} <br></br>
-                            Status: In <br></br>
                             Region: {val.licenseState} <br></br>
                           </Card.Body>
                         </Accordion.Collapse>

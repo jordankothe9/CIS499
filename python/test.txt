@@ -1,11 +1,11 @@
 {
     "VehicleType": "Sedan",
-    "LicensePlate": "TST123",
-    "LicensePlateConf": 0.954,
-    "Make": "Jeep",
-    "Model": "CJ",
-    "Color": "White",
+    "LicensePlate": "PDS679",
+    "LicensePlateConf": 0.924,
+    "Make": "Nissian",
+    "Model": "Rogue",
+    "Color": "Black",
     "State": "SC",
-    "Status": "out",
+    "Status": "in",
     "TimeStamp": "now"
 }
